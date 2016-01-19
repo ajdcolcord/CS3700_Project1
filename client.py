@@ -1,59 +1,80 @@
-#!/usr/bin/python
-
-import sys
+# Austin Colcord and Nick Scheuring
 import socket
+import sys
 
-port = str(sys.argv[1])
-sflag = str(sys.argv[2])
-hostname = str(sys.argv[3])
-neuid = str(sys.argv[4])
+# set global flag to indicate if the socket is closed or not
+closed_flag = False
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-host = socket.gethostname()
-
-ipaddr = socket.gethostbyname(hostname)
-
-def get_message():
-    mess = sock.recv(1024)
-    parse_message(mess)
-    
-def parse_message(message):
-    message_arr = str(message).split()
-    if message_arr[0] == 'STATUS':
-        problem = message_arr[1] #CHANGE THIS
-        print result
-        result = ""
-        send_message(result)
-    elif message_arr[0] == 'BYE':
-        print message_arr[1] + '\n'
-        sock.close()
+# this function calculates the result based on the
+# two number inputs first and second, and the operator
+def calculate(first, second, operator):
+    result = ""
+    if operator == "+":
+            result = int(first) + int(second)
+    elif operator == "-":
+        result = int(first) - int(second)
+    elif operator == "/":
+        result = int(first) / int(second)
+    elif operator == "*":
+        result = int(first) * int(second)
     else:
-        print "NO MESSAGE"
+        print "Did not recognize: " + operator
 
-def send_message(message):
-    sock.send(message + '\n');
+    print "Result = " + str(result)
+    return result
 
-print ipaddr
 
-try:
-    sock.connect((ipaddr, int(port)))
-except:
-    alert("FAILED TO CONNECT")
+# this function parses the message based on the message type
+def parse_message(message, sock):
+    message_arr = str(message).split()
+    if message_arr[1] == 'STATUS':
+        first = message_arr[2]
+        operator = message_arr[3]
+        second = message_arr[4]
 
-#send hello
-try:
-    send_message('HELLO' + neuid)
-except:
-    "Failed to send HELLO"
-#get initial message
-message = True
+        result = calculate(first, second, operator)
 
-while message:
-    print message
-    message = sock.recv(1024)
-    if message:
-        print message
-        parse_message(message)
+        sock.send("cs3700spring2016 " + str(result) + '\n')
+    if message_arr[1] == 'BYE':
+        sock.close()
+        global closed_flag
+        closed_flag = True
 
-sock.close()
+
+# this is the main functions, running all necessary steps
+# to open the socket and send and receive messages
+def main():
+
+    # get arguments from console
+    port = int(sys.argv[1])
+    sflag = str(sys.argv[2])
+    hostname = str(sys.argv[3])
+    neuid = str(sys.argv[4])
+
+    # create the socket
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    # connect the socket to the host
+    try:
+        s.connect((hostname, port))
+    except socket.error:
+        print "Failed To Connect Socket to Host"
+
+    # send the hello message
+    try:
+        s.send("cs3700spring2016 HELLO " + neuid + "\n")
+    except socket.error:
+        print "Failed To Send Hello Message"
+
+    # continuously receive and send messages
+    while 1:
+        global closed_flag
+        if closed_flag:
+            break
+        received = s.recv(1024)
+        print received
+        parse_message(received, s)
+
+
+main()
