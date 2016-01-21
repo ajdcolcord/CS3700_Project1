@@ -60,6 +60,7 @@ def main():
         s.connect((hostname, port))
     except socket.error:
         print "Failed To Connect Socket to Host"
+        sys.exit(1)
 
     # send the hello message
     try:
