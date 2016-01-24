@@ -73,28 +73,42 @@ def main():
         sflag = None
         hostname = str(sys.argv[1])
         neuid = str(sys.argv[2])
-
-    # if port or sflag are provided
+    
+    # if -s flag given (or invalid arguments)
     elif len(sys.argv) == 4:
         if sys.argv[1] == '-s':
-            port = 27993
+            port = 27994
             sflag = True
         else:
-            port = int(sys.argv[1])
-            sflag = None
+            print "Error: Invalid arguments"
+            sys.exit()
 
         hostname = str(sys.argv[2])
         neuid = str(sys.argv[3])
-
-    # if port and sflag are provided
+    
+    # if port or sflag are provided
     elif len(sys.argv) == 5:
+        if sys.argv[1] == '-p':
+            port = int(sys.argv[2])
+            sflag = False
+        else:
+            print 'ERROR: Invalid Argument for Second Parameter'
+            sys.exit()
 
-        port = int(sys.argv[1])
-        sflag = str(sys.argv[2])
-        if sflag != '-s':
-            sflag = None
         hostname = str(sys.argv[3])
         neuid = str(sys.argv[4])
+
+    # if port and sflag are provided
+    elif len(sys.argv) == 6:
+        if sys.argv[1] == '-p' and sys.argv[3] == '-s':
+            port = int(sys.argv[2])
+            sflag = True
+        else:
+            print 'Error: Invalid Argument for port or s flags'
+            sys.exit()
+
+        hostname = str(sys.argv[4])
+        neuid = str(sys.argv[5])
 
     # create the socket
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -108,10 +122,7 @@ def main():
 
     # if ssl flag is there, create the ssl connection
     if sflag:
-        sock = s
-        #ssl.wrap_socket(s, cert_reqs=ssl.CERT_NONE)
-        print "SSL Not Supported"
-        sys.exit(1)
+        sock = ssl.wrap_socket(s, cert_reqs=ssl.CERT_NONE)
     else:
         sock = s
 
