@@ -15,12 +15,12 @@ High-Level Approach:
     - Created a loop to solve the math problems until BYE was received
     - Printed out the secret message
     - Verified project specifications were met
-    - Attempted to solve SSL extra credit piece
+    - Implemented SSL connection options
 
 Issues:
     - Did not see that we should include the 'cs3700spring2016' for the messages,
     so we had issues getting any messages from the server
-    - SSL issues - EOF - can't seem to figure out how to connect using SSL
+    - SSL issues - EOF errors - was using incorrect port number during execution
 
 Testing:
     - Run through the non-ssl version multiple times
