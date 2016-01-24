@@ -106,7 +106,10 @@ def main():
 
     # if ssl flag is there, create the ssl connection
     if sflag:
-        sock = s #ssl.wrap_socket(s, cert_reqs=ssl.CERT_NONE)
+        sock = s
+        #ssl.wrap_socket(s, cert_reqs=ssl.CERT_NONE)
+        print "SSL Not Supported"
+        sys.exit(1)
     else:
         sock = s
 
